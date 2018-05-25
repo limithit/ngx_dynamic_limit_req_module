@@ -50,7 +50,9 @@ Configuration example：
         }
     }
 
-
+### Support black-and-white list
+   White list rules redis-cli ```set whilteip ip```
+   Black list rules redis-cli ```set ip ip ```
 
 ## Installation
 
