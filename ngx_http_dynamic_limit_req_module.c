@@ -228,9 +228,10 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	r->main->limit_req_set = 1;
 	reply = redisCommand(c, "GET %s", Host);
 
-	if (reply->str != NULL)
+	if (reply->str != NULL) {
 		ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 				"limit_reqredis=[%s]", reply->str);
+	}
 	/* return http_status redis*/
 
 	if (!ngx_strcmp((char *) Host, reply->str) && reply->str != NULL) {
