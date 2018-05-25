@@ -67,7 +67,7 @@ Configuration example：
     make install 
     
     cd nginx-**version**
-    ./configure --add-module=/path/to/this/ngx_dynamic_limit_req_module
+    ./configure --add-module=/path/to/this/ngx_dynamic_limit_req_module --with-debug
     make
     make install
 
