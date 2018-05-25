@@ -1,0 +1,27 @@
+ngx_waf_incs="/usr/local/include/hiredis"
+ngx_waf_libs="-lhiredis"
+ngx_addon_name=ngx_http_dynamic_limit_req_module
+
+EXECUTE_SRCS="                                                           \
+             $ngx_addon_dir/ngx_http_dynamic_limit_req_module.c                  \
+             "
+
+EXECUTE_DEPS="                                                           \
+             "
+
+if test -n "$ngx_module_link"; then
+    ngx_module_type=HTTP
+    ngx_module_name=ngx_http_dynamic_limit_req_module
+    ngx_module_deps="$EXECUTE_DEPS"
+    ngx_module_srcs="$EXECUTE_SRCS"
+     ngx_module_libs="$ngx_waf_libs"
+    ngx_module_incs="$ngx_waf_incs"
+
+    . auto/module
+else
+    HTTP_MODULES="$HTTP_MODULES ngx_http_dynamic_limit_req_module"
+    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $EXECUTE_SRCS"
+    NGX_ADDON_DEPS="$NGX_ADDON_DEPS $EXECUTE_DEPS"
+     ngx_module_libs="$ngx_waf_libs"
+    ngx_module_incs="$ngx_waf_incs"
+fi
