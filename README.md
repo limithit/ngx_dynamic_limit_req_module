@@ -19,8 +19,7 @@ Configuration example：
         
         dynamic_limit_req_zone $binary_remote_addr zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
         dynamic_limit_req_zone $binary_remote_addr zone=two:10m rate=50r/s redis=127.0.0.1 block_second=600;
-        dynamic_limit_req zone=one burst=5 nodelay;
-        dynamic_limit_req_status 403;
+        
         
         server {
             listen       80;
@@ -28,6 +27,8 @@ Configuration example：
             location / {
                 root   html;
                 index  index.html index.htm;
+                dynamic_limit_req zone=one burst=5 nodelay;
+                dynamic_limit_req_status 403;
             }
             error_page   500 502 503 504  /50x.html;
             location = /50x.html {
