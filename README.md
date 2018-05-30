@@ -92,7 +92,7 @@ This module is compatible with following nginx releases:
 
     unixsocket /var/run/redis/redis.sock
 
-    unixsocketperm 777
+    unixsocketperm 700
 ```
 or: Solution on Linux is:
 ```
