@@ -104,7 +104,7 @@ Solution on Linux is:
 
 ```echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle```
 
-Recommending the first scheme
+﻿Recommending the first scheme
 
 Author
 Gandalf zhibu1991@gmail.com
