@@ -98,7 +98,7 @@ This module is compatible with following nginx releases:
 or: Solution on Linux is:
 
     ```echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse```
-
+```--add-module=PATH```
 
     ```echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle```
 
