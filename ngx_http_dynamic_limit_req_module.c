@@ -1,8 +1,6 @@
 /*
  * Copyright (C) Igor Sysoev
  * Copyright (C) Nginx, Inc.
- * Copyright (c)  西门吹雪 
- * zhibu1991@gmail.com
  */
 
 #include <ngx_config.h>
@@ -233,6 +231,8 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	reply = redisCommand(c, "GET %s", Host);
 
 	if (reply->str == NULL) {
+		freeReplyObject(reply);
+		redisFree(c);
 		return NGX_OK;
 	}
 	/* return http_status redis*/
@@ -260,12 +260,12 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 			ctx->node = NULL;
 		}
-
+		freeReplyObject(reply);
+		redisFree(c);
 		return lrcf->status_code;
 	}
 
-	freeReplyObject(reply);
-	redisFree(c);
+
 
 	/* rc == NGX_AGAIN || rc == NGX_OK */
 
