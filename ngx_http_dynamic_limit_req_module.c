@@ -1,6 +1,8 @@
 /*
  * Copyright (C) Igor Sysoev
  * Copyright (C) Nginx, Inc.
+ * Copyright (C)  西门吹雪 
+ * zhibu1991@gmail.com
  */
 
 #include <ngx_config.h>
