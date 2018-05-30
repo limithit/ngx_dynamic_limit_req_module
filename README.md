@@ -89,13 +89,13 @@ This module is compatible with following nginx releases:
  At the same time, if there is no need for the external network, we can also let Redis run in the way of Unix Socket to avoid the performance bottleneck of the TCP/IP, and achieve a performance improvement of 25% in high access scenarios
 
 
-#1: ``` Modify the configuration file /etc/redis/redis.conf```
+    ```Modify the configuration file /etc/redis/redis.conf```
 
     ```unixsocket /var/run/redis/redis.sock```
 
     ```unixsocketperm 777```
 
-#1: Solution on Linux is:
+or: Solution on Linux is:
 
     ```echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse```
 
