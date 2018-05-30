@@ -92,7 +92,7 @@ This module is compatible with following nginx releases:
 
     echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle
 ```
-## Recommending the first scheme
+## Recommend a single redis-server
 
 Author
 Gandalf zhibu1991@gmail.com
