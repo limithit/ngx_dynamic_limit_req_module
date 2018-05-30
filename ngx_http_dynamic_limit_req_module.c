@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Igor Sysoev
  * Copyright (C) Nginx, Inc.
- * Copyright (C)  西门吹雪 
+ * Copyright (C)  西门吹雪
  * zhibu1991@gmail.com
  */
 
@@ -243,8 +243,8 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 //	if (rc == NGX_BUSY || rc == NGX_ERROR) {
 
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-				"limiting requests, excess: %ui.%03ui by zone \"%V\" ",
-				excess / 1000, excess % 1000, &limit->shm_zone->shm.name);
+				"limiting requests, excess: %ui.%03ui by zone \"%V\"  ip=%s",
+				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, Host);
 
 
 		while (n--) {
