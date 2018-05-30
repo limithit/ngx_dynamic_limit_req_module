@@ -93,7 +93,7 @@ This module is compatible with following nginx releases:
     ```unixsocket /var/run/redis/redis.sock```
 
     ```unixsocketperm 777```
-
+```
 or: Solution on Linux is:
 
     ```echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse```
