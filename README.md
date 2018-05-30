@@ -91,6 +91,8 @@ This module is compatible with following nginx releases:
 ###Modify the configuration file /etc/redis/redis.conf
 
 ```unixsocket /var/run/redis/redis.sock```
+
+
 ```unixsocketperm 777```
 
 ###OR
