@@ -82,17 +82,5 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
 ```
 This module is compatible with following nginx releases:
 
-## FAQ?
-
-###  "redis connection error: Cannot assign requested address 127.0.0.1"
-
- Solution on Linux is:
-```
-    echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse
-
-    echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle
-```
-## Recommend a single redis-server
-
 Author
 Gandalf zhibu1991@gmail.com
