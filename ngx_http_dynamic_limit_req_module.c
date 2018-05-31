@@ -154,7 +154,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
     redisContext *c;
 	redisReply *reply;
-	u_char *Host[256];
+	u_char *Host[14];
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 	c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
 	if (c == NULL || c->err) {
