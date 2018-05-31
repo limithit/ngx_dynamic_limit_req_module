@@ -1,7 +1,7 @@
 /*
  * Copyright (C) Igor Sysoev
  * Copyright (C) Nginx, Inc.
- * Copyright (C)  西门吹雪
+ * Copyright (C)  西门吹雪 
  * zhibu1991@gmail.com
  */
 
@@ -154,7 +154,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
     redisContext *c;
 	redisReply *reply;
-
+	u_char *Host[14];
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 	c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
 	if (c == NULL || c->err) {
@@ -205,19 +205,19 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 		ngx_shmtx_unlock(&ctx->shpool->mutex);
 
+		memcpy(Host, r->connection->addr_text.data,
+				r->connection->addr_text.len);
 		ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 				"limit_req[%ui]: %i %ui.%03ui %s", n, rc, excess / 1000,
 				excess % 1000, r->headers_in.server.data);
 
-		if (rc && strncmp((char *) (&r->connection->addr_text)->data,
-						"127.0.0.1", 9) != 0) {
-			reply = redisCommand(c, "GET white%s",
-					(char *) (&r->connection->addr_text)->data);
+		if (rc && strlen((char *) Host) <= 14 && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
+			ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+					"limit_req ip=%s", Host);
+			reply = redisCommand(c, "GET white%s", Host);
 			if (reply->str == NULL) {
-				reply = redisCommand(c, "SETEX %s %s %s",
-						(char *) (&r->connection->addr_text)->data,
-						block_second,
-						(char *) (&r->connection->addr_text)->data);
+				reply = redisCommand(c, "SETEX %s %s %s", Host, block_second,
+						Host);
 			}
 		}
 		if (rc != NGX_AGAIN) {
@@ -230,7 +230,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	}
 
 	r->main->limit_req_set = 1;
-	reply = redisCommand(c, "GET %s", (char *) (&r->connection->addr_text)->data);
+	reply = redisCommand(c, "GET %s", Host);
 
 	if (reply->str == NULL) {
 		freeReplyObject(reply);
@@ -239,12 +239,12 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	}
 	/* return http_status redis*/
 
-	if (!ngx_strcmp((char *) (&r->connection->addr_text)->data, reply->str)) {
+	if (!ngx_strcmp((char *) Host, reply->str)) {
 //	if (rc == NGX_BUSY || rc == NGX_ERROR) {
 
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-				"limiting requests, excess: %ui.%03ui by zone \"%V\"  ip=%s",
-				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, (&r->connection->addr_text)->data);
+				"limiting requests, excess: %ui.%03ui by zone \"%V\" ",
+				excess / 1000, excess % 1000, &limit->shm_zone->shm.name);
 
 
 		while (n--) {
