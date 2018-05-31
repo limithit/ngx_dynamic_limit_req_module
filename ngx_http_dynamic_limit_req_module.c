@@ -205,7 +205,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 		ngx_shmtx_unlock(&ctx->shpool->mutex);
 
-		memcpy(Host, r->connection->addr_text.data,
+		memmove(Host, r->connection->addr_text.data,
 				r->connection->addr_text.len);
 		ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 				"limit_req[%ui]: %i %ui.%03ui %s", n, rc, excess / 1000,
