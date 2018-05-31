@@ -210,8 +210,6 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				excess % 1000, r->headers_in.server.data);
 
 		if (rc && strlen((char *) (&r->connection->addr_text)->data) <= 14 && strncmp((char *) (&r->connection->addr_text)->data, "127.0.0.1", 9) != 0) {
-			ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-					"limit_req ip=%s", Host);
 			reply = redisCommand(c, "GET white%s", (char *) (&r->connection->addr_text)->data);
 			if (reply->str == NULL) {
 				reply = redisCommand(c, "SETEX %s %s %s", (char *) (&r->connection->addr_text)->data, block_second,
