@@ -152,17 +152,18 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	limit = NULL;
 #endif
 
-    redisContext *c;
+	redisContext *c;
 	redisReply *reply;
-	u_char *Host[14];
+	char Host[r->connection->addr_text.len];
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
+
 	c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
 	if (c == NULL || c->err) {
 		if (c) {
-			if (redis_ip){
-			ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-					"redis connection error: %s %s\n",
-					c->errstr, redis_ip ? redis_ip :(u_char *)"[ No configuration of redis]");
+			if (redis_ip) {
+				ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
+						"redis connection error: %s %s\n", c->errstr,
+						redis_ip ? redis_ip : (u_char * )"[ No configuration of redis]");
 			}
 			redisFree(c);
 			/* Redis if the connection is wrong,
@@ -211,9 +212,9 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				"limit_req[%ui]: %i %ui.%03ui %s", n, rc, excess / 1000,
 				excess % 1000, r->headers_in.server.data);
 
-		if (rc && strlen((char *) Host) <= 14 && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
-			ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-					"limit_req ip=%s", Host);
+		if (rc && strlen((char *) Host) == r->connection->addr_text.len
+			    && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
+
 			reply = redisCommand(c, "GET white%s", Host);
 			if (reply->str == NULL) {
 				reply = redisCommand(c, "SETEX %s %s %s", Host, block_second,
@@ -243,8 +244,11 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 //	if (rc == NGX_BUSY || rc == NGX_ERROR) {
 
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-				"limiting requests, excess: %ui.%03ui by zone \"%V\" ",
-				excess / 1000, excess % 1000, &limit->shm_zone->shm.name);
+				"limiting requests, excess: %ui.%03ui by zone \"%V\" "
+				"ip=%s ip2=%V num1=%d ,num2=%d",
+				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, Host,
+				&r->connection->addr_text, strlen((char * )Host),
+				r->connection->addr_text.len);
 
 
 		while (n--) {
