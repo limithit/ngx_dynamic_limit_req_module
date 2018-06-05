@@ -219,6 +219,11 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 			if (reply->str == NULL) {
 				reply = redisCommand(c, "SETEX %s %s %s", Host, block_second,
 						Host);
+				/* Increase the history record  */
+				reply = redisCommand(c,"SELECT 1");
+				reply = redisCommand(c, "SET %s %s", Host, Host);
+				reply = redisCommand(c,"SELECT 0");
+				/* Increase the history record */
 			}
 		}
 		if (rc != NGX_AGAIN) {
@@ -245,7 +250,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 				"limiting requests, excess: %ui.%03ui by zone \"%V\" "
-				"ip=%s ip2=%V num1=%d ,num2=%d",
+				"ip=%s ip2=%V num1=%d num2=%d",
 				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, Host,
 				&r->connection->addr_text, strlen((char * )Host),
 				r->connection->addr_text.len);
