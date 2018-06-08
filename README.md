@@ -54,10 +54,15 @@ Configuration example：
 ## Support black-and-white list
 
 ###  White list rules
- redis-cli ```set whiteip ip```
+ ```redis-cli set whiteip ip```
  
+ example：
+ ```redis-cli set white192.168.1.1 192.168.1.1```
 ###  Black list rules 
- redis-cli ```set ip ip ```
+ ```redis-cli set ip ip ```
+ 
+ example：
+ ```redis-cli set 192.168.1.2 192.168.1.2```
 
 
 ## Installation
