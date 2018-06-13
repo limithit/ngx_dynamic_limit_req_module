@@ -25,6 +25,10 @@ Configuration example：
             listen       80;
             server_name  localhost;
             location / {
+                
+                if ($http_x_forwarded_host) {
+                 return 400;
+                }
                 root   html;
                 index  index.html index.htm;
                 dynamic_limit_req zone=one burst=5 nodelay;
