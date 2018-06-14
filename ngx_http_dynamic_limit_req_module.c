@@ -154,7 +154,8 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 	redisContext *c;
 	redisReply *reply;
-	char Host[r->connection->addr_text.len];
+
+	char Host[256];
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 
 	c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
@@ -206,14 +207,15 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 		ngx_shmtx_unlock(&ctx->shpool->mutex);
 
-		memcpy(Host, r->connection->addr_text.data,
-				r->connection->addr_text.len);
+		const char *fmt_base = "%.*s";
+		snprintf((char *) Host, sizeof(Host), fmt_base,
+				r->connection->addr_text.len, r->connection->addr_text.data);
+
 		ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 				"limit_req[%ui]: %i %ui.%03ui %s", n, rc, excess / 1000,
 				excess % 1000, r->headers_in.server.data);
 
-		if (rc && strlen((char *) Host) == r->connection->addr_text.len
-			    && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
+		if (rc  && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
 
 			reply = redisCommand(c, "GET white%s", Host);
 			if (reply->str == NULL) {
@@ -251,7 +253,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 				"limiting requests, excess: %ui.%03ui by zone \"%V\" "
 				"ip=%s ip2=%V num1=%d num2=%d",
-				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, Host,
+				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, (char *)Host,
 				&r->connection->addr_text, strlen((char * )Host),
 				r->connection->addr_text.len);
 
