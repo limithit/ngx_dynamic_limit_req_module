@@ -72,7 +72,7 @@ Configuration example：
 ## Installation
 
 ###  Option #1: Compile Nginx with module bundled
-    cd redis-4.0**version**/deps/hiredis
+    cd redis-**version**/deps/hiredis
     make 
     make install 
     
