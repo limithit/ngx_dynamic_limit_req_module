@@ -31,7 +31,7 @@ Configuration example：
                 }
                 root   html;
                 index  index.html index.htm;
-                dynamic_limit_req zone=one burst=5 nodelay;
+                dynamic_limit_req zone=one burst=100 nodelay;
                 dynamic_limit_req_status 403;
             }
             error_page   500 502 503 504  /50x.html;
@@ -45,7 +45,7 @@ Configuration example：
             location / {
                 root   html;
                 index  index.html index.htm;
-                dynamic_limit_req zone=two burst=5 nodelay;
+                dynamic_limit_req zone=two burst=50 nodelay;
                 dynamic_limit_req_status 403;
             }
             error_page   500 502 503 504  /50x.html;
