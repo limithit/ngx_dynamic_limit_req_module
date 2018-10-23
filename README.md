@@ -45,6 +45,11 @@ Configuration example：
             location / {
                 root   html;
                 index  index.html index.htm;
+                      if ($document_uri ~* "getSmsVerifyCode.do"){
+                      dynamic_limit_req zone=two burst=5 nodelay;
+                      dynamic_limit_req_status 444;
+                }
+
                 dynamic_limit_req zone=two burst=50 nodelay;
                 dynamic_limit_req_status 403;
             }
