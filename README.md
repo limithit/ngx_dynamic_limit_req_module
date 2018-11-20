@@ -35,7 +35,7 @@ Configuration example：
                 dynamic_limit_req zone=one burst=100 nodelay;
                 dynamic_limit_req_status 403;
             }
-            error_page   500 502 503 504  /50x.html;
+            error_page   403 500 502 503 504  /50x.html;
             location = /50x.html {
                 root   html;
             }
@@ -45,7 +45,21 @@ Configuration example：
             server_name  localhost2;
             location / {
                 root   html;
-                index  index.html index.htm;
+                index  index.html index.htm; 
+                
+                    set $flag 0;
+                   if ($document_uri ~* "regist"){
+                      set $flag "${flag}1";
+                        }
+                  if ($request_method = POST ) {
+                        set $flag "${flag}2";
+                          }
+                      if ($flag = "012"){
+                      dynamic_limit_req zone=sms burst=3 nodelay;
+                      dynamic_limit_req_status 403;
+                      }
+
+                
                       if ($document_uri ~* "getSmsVerifyCode.do"){
                       dynamic_limit_req zone=sms burst=5 nodelay;
                       dynamic_limit_req_status 444;
@@ -54,7 +68,7 @@ Configuration example：
                 dynamic_limit_req zone=two burst=50 nodelay;
                 dynamic_limit_req_status 403;
             }
-            error_page   500 502 503 504  /50x.html;
+            error_page   403 502 503 504  /50x.html;
             location = /50x.html {
                 root   html;
             }
