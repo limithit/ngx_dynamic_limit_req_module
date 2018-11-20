@@ -73,9 +73,11 @@ Configuration example：
  
  example：
  ```redis-cli set 192.168.1.2 192.168.1.2```
-### redis.conf 
-# Close the connection after a client is idle for N seconds (0 to disable)
-``timeout 3```
+ 
+## redis.conf 
+### Close the connection after a client is idle for N seconds (0 to disable)
+ 
+```timeout 3```
 
 ## Installation
 
