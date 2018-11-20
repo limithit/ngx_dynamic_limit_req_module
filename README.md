@@ -97,5 +97,22 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
 ```
 This module is compatible with following nginx releases:
 
+## Issues ?
+redis connection error: Cannot assign requested address 127.0.0.1?
+
+dmesg: TCP: Peer *.*.*.*:38639/80 unexpectedly shrunk window 2990548528:2990549738 (repaired)
+
+redis.conf
+```
+# Unix socket.
+#
+# Specify the path for the Unix socket that will be used to listen for
+# incoming connections. There is no default, so Redis will not listen
+# on a unix socket when not specified.
+#
+ unixsocket /tmp/redis.sock
+ ```
+
+
 Author
 Gandalf zhibu1991@gmail.com
