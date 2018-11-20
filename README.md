@@ -96,10 +96,6 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
     load_module /path/to/modules/ngx_dynamic_limit_req_module.so;
 ```
 
-## redis.conf 
-### Close the connection after a client is idle for N seconds (0 to disable)
-```timeout 3```
-
 This module is compatible with following nginx releases:
 
 Author
