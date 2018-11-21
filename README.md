@@ -109,12 +109,6 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
 ```nginx
     load_module /path/to/modules/ngx_dynamic_limit_req_module.so;
 ```
-## Issue?
-1)redis connection error: Cannot assign requested address 
-```
-echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse
-echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle
-```
 
 This module is compatible with following nginx releases:
 
