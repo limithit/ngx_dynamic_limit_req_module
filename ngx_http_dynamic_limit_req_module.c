@@ -218,7 +218,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				excess % 1000, r->headers_in.server.data);
 
 		if (rc && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
-
+                       if (!c->err){
 			reply = redisCommand(c, "GET white%s", Host);
 			if (reply->str == NULL) {
 				reply = redisCommand(c, "SETEX %s %s %s", Host, block_second,
@@ -229,6 +229,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				reply = redisCommand(c, "SELECT 0");
 				/* Increase the history record */
 			}
+                }
 		}
 		if (rc != NGX_AGAIN) {
 			break;
@@ -240,17 +241,17 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	}
 
 	r->main->limit_req_set = 1;
-	reply = redisCommand(c, "GET %s", Host);
 
+        if (!c->err){
+	reply = redisCommand(c, "GET %s", Host);
 	if (reply->str == NULL) {
-		freeReplyObject(reply);
+     	freeReplyObject(reply);
 		return NGX_OK;
 	}
+      }
 	/* return http_status redis*/
-
+if (!c->err){
 	if (!ngx_strcmp((char * ) Host, reply->str)) {
-//	if (rc == NGX_BUSY || rc == NGX_ERROR) {
-
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 				"limiting requests, excess: %ui.%03ui by zone \"%V\" lock=%s length=%d",
 				excess / 1000, excess % 1000, &limit->shm_zone->shm.name,
@@ -280,6 +281,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 		freeReplyObject(reply);
 		return lrcf->status_code;
 	}
+}
 
 	/* rc == NGX_AGAIN || rc == NGX_OK */
 
@@ -304,7 +306,10 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	r->read_event_handler = ngx_http_test_reading;
 	r->write_event_handler = ngx_http_limit_req_delay;
 	ngx_add_timer(r->connection->write, delay);
-	redisFree(c);
+
+        if (!c->err){
+	  redisFree(c);
+        }
 	return NGX_AGAIN;
 }
 
