@@ -115,11 +115,7 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
 echo 1 > /proc/sys/net/ipv4/tcp_tw_reuse
 echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle
 ```
-2)nginx too many established
-```
-nginx.conf
-keepalive_timeout  6;
-```
+
 This module is compatible with following nginx releases:
 
 Author
