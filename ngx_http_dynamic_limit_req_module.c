@@ -244,7 +244,6 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 	if (reply->str == NULL) {
 		freeReplyObject(reply);
-		redisFree(c);
 		return NGX_OK;
 	}
 	/* return http_status redis*/
@@ -279,7 +278,6 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 			ctx->node = NULL;
 		}
 		freeReplyObject(reply);
-		redisFree(c);
 		return lrcf->status_code;
 	}
 
@@ -306,7 +304,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	r->read_event_handler = ngx_http_test_reading;
 	r->write_event_handler = ngx_http_limit_req_delay;
 	ngx_add_timer(r->connection->write, delay);
-
+	redisFree(c);
 	return NGX_AGAIN;
 }
 
