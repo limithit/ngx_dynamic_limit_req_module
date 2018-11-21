@@ -10,8 +10,10 @@
 #include <ngx_http.h>
 #include <hiredis/hiredis.h>
 
-
 u_char *redis_ip = NULL, *block_second;
+
+redisContext *c;
+redisReply *reply;
 
 typedef struct {
 	u_char color;
@@ -71,9 +73,9 @@ static char *ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_http_limit_req_init(ngx_conf_t *cf);
 
 static ngx_conf_enum_t ngx_http_limit_req_log_levels[] = { { ngx_string("info"),
-		NGX_LOG_INFO }, { ngx_string("notice"), NGX_LOG_NOTICE }, { ngx_string(
+NGX_LOG_INFO }, { ngx_string("notice"), NGX_LOG_NOTICE }, { ngx_string(
 		"warn"), NGX_LOG_WARN }, { ngx_string("error"), NGX_LOG_ERR }, {
-		ngx_null_string, 0 } };
+ngx_null_string, 0 } };
 
 static ngx_conf_num_bounds_t ngx_http_limit_req_status_bounds = {
 		ngx_conf_check_num_bounds, 400, 599 };
@@ -152,19 +154,19 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	limit = NULL;
 #endif
 
-	redisContext *c;
-	redisReply *reply;
-
 	char Host[256];
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
-
-	c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
+	if (c == NULL) {
+		c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
+	}
 	if (c == NULL || c->err) {
 		if (c) {
 			if (redis_ip) {
 				ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 						"redis connection error: %s %s\n", c->errstr,
-						redis_ip ? redis_ip : (u_char * )"[ No configuration of redis]");
+						redis_ip ?
+								redis_ip :
+								(u_char * )"[ No configuration of redis]");
 			}
 			redisFree(c);
 			/* Redis if the connection is wrong,
@@ -215,16 +217,16 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				"limit_req[%ui]: %i %ui.%03ui %s", n, rc, excess / 1000,
 				excess % 1000, r->headers_in.server.data);
 
-		if (rc  && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
+		if (rc && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
 
 			reply = redisCommand(c, "GET white%s", Host);
 			if (reply->str == NULL) {
 				reply = redisCommand(c, "SETEX %s %s %s", Host, block_second,
 						Host);
 				/* Increase the history record  */
-				reply = redisCommand(c,"SELECT 1");
+				reply = redisCommand(c, "SELECT 1");
 				reply = redisCommand(c, "SET %s %s", Host, Host);
-				reply = redisCommand(c,"SELECT 0");
+				reply = redisCommand(c, "SELECT 0");
 				/* Increase the history record */
 			}
 		}
@@ -247,19 +249,19 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	}
 	/* return http_status redis*/
 
-	if (!ngx_strcmp((char *) Host, reply->str)) {
+	if (!ngx_strcmp((char * ) Host, reply->str)) {
 //	if (rc == NGX_BUSY || rc == NGX_ERROR) {
 
 		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 				"limiting requests, excess: %ui.%03ui by zone \"%V\" lock=%s length=%d",
-				excess / 1000, excess % 1000, &limit->shm_zone->shm.name, (char *)Host,
-				strlen((char * )Host));
+				excess / 1000, excess % 1000, &limit->shm_zone->shm.name,
+				(char * )Host, strlen((char * )Host));
 
 		ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-						"limit_lock]: by zone=\"%V\" ip=%s ip2=%V len=%d len2=%d ", &limit->shm_zone->shm.name, (char *)Host,
-						&r->connection->addr_text, strlen((char * )Host),
-						r->connection->addr_text.len);
-
+				"limit_lock]: by zone=\"%V\" ip=%s ip2=%V len=%d len2=%d ",
+				&limit->shm_zone->shm.name, (char * )Host,
+				&r->connection->addr_text, strlen((char * )Host),
+				r->connection->addr_text.len);
 
 		while (n--) {
 			ctx = limits[n].shm_zone->data;
@@ -280,8 +282,6 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 		redisFree(c);
 		return lrcf->status_code;
 	}
-
-
 
 	/* rc == NGX_AGAIN || rc == NGX_OK */
 
@@ -738,7 +738,7 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_req_ctx_t));
 	if (ctx == NULL) {
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	ngx_memzero(&ccv, sizeof(ngx_http_compile_complex_value_t));
@@ -748,7 +748,7 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 	ccv.complex_value = &ctx->key;
 
 	if (ngx_http_compile_complex_value(&ccv) != NGX_OK) {
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	size = 0;
@@ -767,7 +767,7 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			if (p == NULL) {
 				ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 						"invalid zone size \"%V\"", &value[i]);
-				return NGX_CONF_ERROR;
+				return NGX_CONF_ERROR ;
 			}
 
 			name.len = p - name.data;
@@ -780,13 +780,13 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			if (size == NGX_ERROR) {
 				ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 						"invalid zone size \"%V\"", &value[i]);
-				return NGX_CONF_ERROR;
+				return NGX_CONF_ERROR ;
 			}
 
 			if (size < (ssize_t) (8 * ngx_pagesize)) {
 				ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 						"zone \"%V\" is too small", &value[i]);
-				return NGX_CONF_ERROR;
+				return NGX_CONF_ERROR ;
 			}
 
 			continue;
@@ -810,7 +810,7 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			if (rate <= 0) {
 				ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid rate \"%V\"",
 						&value[i]);
-				return NGX_CONF_ERROR;
+				return NGX_CONF_ERROR ;
 			}
 
 			continue;
@@ -834,13 +834,13 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid parameter \"%V\"",
 				&value[i]);
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	if (name.len == 0) {
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 				"\"%V\" must have \"zone\" parameter", &cmd->name);
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	ctx->rate = rate * 1000 / scale;
@@ -848,7 +848,7 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 	shm_zone = ngx_shared_memory_add(cf, &name, size,
 			&ngx_http_dynamic_limit_req_module);
 	if (shm_zone == NULL) {
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	if (shm_zone->data) {
@@ -857,7 +857,7 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 				"%V \"%V\" is already bound to key \"%V\"", &cmd->name, &name,
 				&ctx->key.value);
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	shm_zone->init = ngx_http_limit_req_init_zone;
@@ -892,7 +892,7 @@ ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			shm_zone = ngx_shared_memory_add(cf, &s, 0,
 					&ngx_http_dynamic_limit_req_module);
 			if (shm_zone == NULL) {
-				return NGX_CONF_ERROR;
+				return NGX_CONF_ERROR ;
 			}
 
 			continue;
@@ -904,7 +904,7 @@ ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			if (burst <= 0) {
 				ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 						"invalid burst rate \"%V\"", &value[i]);
-				return NGX_CONF_ERROR;
+				return NGX_CONF_ERROR ;
 			}
 
 			continue;
@@ -917,13 +917,13 @@ ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid parameter \"%V\"",
 				&value[i]);
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	if (shm_zone == NULL) {
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 				"\"%V\" must have \"zone\" parameter", &cmd->name);
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	limits = lrcf->limits.elts;
@@ -931,7 +931,7 @@ ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 	if (limits == NULL) {
 		if (ngx_array_init(&lrcf->limits, cf->pool, 1,
 				sizeof(ngx_http_limit_req_limit_t)) != NGX_OK) {
-			return NGX_CONF_ERROR;
+			return NGX_CONF_ERROR ;
 		}
 	}
 
@@ -943,7 +943,7 @@ ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 	limit = ngx_array_push(&lrcf->limits);
 	if (limit == NULL) {
-		return NGX_CONF_ERROR;
+		return NGX_CONF_ERROR ;
 	}
 
 	limit->shm_zone = shm_zone;
