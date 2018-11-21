@@ -156,33 +156,31 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 	char Host[256];
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
-	if (redis_ip == NULL) {
-		return NGX_OK;
-	}
 
 	if (c == NULL) {
 		c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
+		if (c == NULL || c->err) {
+				if (c) {
+					if (redis_ip) {
+						ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
+								"redis connection error: %s %s\n", c->errstr,
+								redis_ip ?
+										redis_ip :
+										(u_char * )"[ No configuration of redis]");
+					}
+					redisFree(c);
+					/* Redis if the connection is wrong,
+					 *  it does not intercept,
+					 *   and returns normally */
+					return NGX_OK;
+				} else {
+					ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
+							"redis connection error: can't allocate redis context\n");
+				}
+			}
 	}
 
-	if (c == NULL || c->err) {
-		if (c) {
-			if (redis_ip) {
-				ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-						"redis connection error: %s %s\n", c->errstr,
-						redis_ip ?
-								redis_ip :
-								(u_char * )"[ No configuration of redis]");
-			}
-			redisFree(c);
-			/* Redis if the connection is wrong,
-			 *  it does not intercept,
-			 *   and returns normally */
-			return NGX_OK;
-		} else {
-			ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-					"redis connection error: can't allocate redis context\n");
-		}
-	}
+
 	for (n = 0; n < lrcf->limits.nelts; n++) {
 
 		limit = &limits[n];
