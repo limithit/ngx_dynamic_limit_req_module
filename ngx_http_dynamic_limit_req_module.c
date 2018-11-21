@@ -164,11 +164,8 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 					if (redis_ip) {
 						ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 								"redis connection error: %s %s\n", c->errstr,
-								redis_ip ?
-										redis_ip :
-										(u_char * )"[ No configuration of redis]");
+								redis_ip ? redis_ip : (u_char * )"[ No configuration of redis]");
 					}
-					redisFree(c);
 					/* Redis if the connection is wrong,
 					 *  it does not intercept,
 					 *   and returns normally */
