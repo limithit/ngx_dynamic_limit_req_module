@@ -218,18 +218,18 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				excess % 1000, r->headers_in.server.data);
 
 		if (rc && strncmp((char *) Host, "127.0.0.1", 9) != 0) {
-                       if (!c->err){
-			reply = redisCommand(c, "GET white%s", Host);
-			if (reply->str == NULL) {
-				reply = redisCommand(c, "SETEX %s %s %s", Host, block_second,
-						Host);
-				/* Increase the history record  */
-				reply = redisCommand(c, "SELECT 1");
-				reply = redisCommand(c, "SET %s %s", Host, Host);
-				reply = redisCommand(c, "SELECT 0");
-				/* Increase the history record */
+			if (!c->err) {
+				reply = redisCommand(c, "GET white%s", Host);
+				if (reply->str == NULL) {
+					reply = redisCommand(c, "SETEX %s %s %s", Host,
+							block_second, Host);
+					/* Increase the history record  */
+					reply = redisCommand(c, "SELECT 1");
+					reply = redisCommand(c, "SET %s %s", Host, Host);
+					reply = redisCommand(c, "SELECT 0");
+					/* Increase the history record */
+				}
 			}
-                }
 		}
 		if (rc != NGX_AGAIN) {
 			break;
@@ -242,45 +242,45 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 
 	r->main->limit_req_set = 1;
 
-        if (!c->err){
-	reply = redisCommand(c, "GET %s", Host);
-	if (reply->str == NULL) {
-     	freeReplyObject(reply);
-		return NGX_OK;
-	}
-      }
-	/* return http_status redis*/
-if (!c->err){
-	if (!ngx_strcmp((char * ) Host, reply->str)) {
-		ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-				"limiting requests, excess: %ui.%03ui by zone \"%V\" lock=%s length=%d",
-				excess / 1000, excess % 1000, &limit->shm_zone->shm.name,
-				(char * )Host, strlen((char * )Host));
-
-		ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-				"limit_lock]: by zone=\"%V\" ip=%s ip2=%V len=%d len2=%d ",
-				&limit->shm_zone->shm.name, (char * )Host,
-				&r->connection->addr_text, strlen((char * )Host),
-				r->connection->addr_text.len);
-
-		while (n--) {
-			ctx = limits[n].shm_zone->data;
-
-			if (ctx->node == NULL) {
-				continue;
-			}
-
-			ngx_shmtx_lock(&ctx->shpool->mutex);
-
-			ctx->node->count--;
-
-			ngx_shmtx_unlock(&ctx->shpool->mutex);
-
-			ctx->node = NULL;
+	if (!c->err) {
+		reply = redisCommand(c, "GET %s", Host);
+		if (reply->str == NULL) {
+			freeReplyObject(reply);
+			return NGX_OK;
 		}
-		freeReplyObject(reply);
-		return lrcf->status_code;
 	}
+	/* return http_status redis*/
+	if (!c->err) {
+		if (!ngx_strcmp((char * ) Host, reply->str)) {
+			ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
+					"limiting requests, excess: %ui.%03ui by zone \"%V\" lock=%s length=%d",
+					excess / 1000, excess % 1000, &limit->shm_zone->shm.name,
+					(char * )Host, strlen((char * )Host));
+
+			ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+					"limit_lock]: by zone=\"%V\" ip=%s ip2=%V len=%d len2=%d ",
+					&limit->shm_zone->shm.name, (char * )Host,
+					&r->connection->addr_text, strlen((char * )Host),
+					r->connection->addr_text.len);
+
+			while (n--) {
+				ctx = limits[n].shm_zone->data;
+
+				if (ctx->node == NULL) {
+					continue;
+				}
+
+				ngx_shmtx_lock(&ctx->shpool->mutex);
+
+				ctx->node->count--;
+
+				ngx_shmtx_unlock(&ctx->shpool->mutex);
+
+				ctx->node = NULL;
+			}
+			freeReplyObject(reply);
+			return lrcf->status_code;
+		}
 }
 
 	/* rc == NGX_AGAIN || rc == NGX_OK */
@@ -307,9 +307,9 @@ if (!c->err){
 	r->write_event_handler = ngx_http_limit_req_delay;
 	ngx_add_timer(r->connection->write, delay);
 
-        if (!c->err){
-	  redisFree(c);
-        }
+	if (!c->err) {
+		redisFree(c);
+	}
 	return NGX_AGAIN;
 }
 
