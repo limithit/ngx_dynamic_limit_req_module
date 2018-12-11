@@ -110,6 +110,8 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
     load_module /path/to/modules/ngx_dynamic_limit_req_module.so;
 ```
 
+### If you want to use the api counting function, please use limithit-patch-1. Because not everyone needs this feature, so it doesn't merge into the trunk.
+
 This module is compatible with following nginx releases:
 
 Author
