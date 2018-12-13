@@ -120,7 +120,7 @@ git checkout limithit-patch-1
 ```
 root@debian:~# redis-cli 
 127.0.0.1:6379> SELECT 3
-127.0.0.1:6379[0]> scan 0 match *12/Dec/2018* count 10000 
+127.0.0.1:6379[3]> scan 0 match *12/Dec/2018* count 10000 
 127.0.0.1:6379[3]> scan 0 match *PV count 10000
 1) "0"
 2) 1) "[13/Dec/2018]PV"
