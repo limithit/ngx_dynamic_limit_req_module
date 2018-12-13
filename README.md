@@ -117,6 +117,22 @@ git clone https://github.com/limithit/ngx_dynamic_limit_req_module.git
 cd ngx_dynamic_limit_req_module
 git checkout limithit-patch-1
 ```
+```
+root@debian:~# redis-cli 
+127.0.0.1:6379> SELECT 3
+127.0.0.1:6379[0]> scan 0 match *12/Dec/2018* count 10000 
+127.0.0.1:6379[3]> scan 0 match *PV count 10000
+1) "0"
+2) 1) "[13/Dec/2018]PV"
+   2) "[12/Dec/2018]PV"
+127.0.0.1:6379[3]> get [12/Dec/2018]PV
+"9144"
+127.0.0.1:6379[3]> get [13/Dec/2018]PV
+"8066"
+127.0.0.1:6379[3]> get [13/Dec/2018]UV
+"214"
+
+```
 
 This module is compatible with following nginx releases:
 
