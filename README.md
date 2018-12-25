@@ -19,7 +19,7 @@ The ngx_dynamic_limit_req_module module  is used to limit the request processing
 * Default: —
 * Context: http, server, location, if
 ## dynamic_limit_req_zone
-* Syntax:	 dynamic_limit_req_zone key zone=name:size rate=rate [sync];
+* Syntax:	 dynamic_limit_req_zone key zone=name:size rate=rate [sync]  redis=127.0.0.1 block_second=time;
 * Default: —
 * Context: http
 
