@@ -10,7 +10,7 @@ Table of Contents
 * [dynamic_limit_req_zone](#dynamic_limit_req_zone)
 * [dynamic_limit_req_log_level](#dynamic_limit_req_log_level)
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
-* [Support-black-and-white-list](#Support-black-and-white-list)
+* [black-and-white-list](#black-and-white-list)
 * [principle](#principle)
 * [Installation](#Installation)
 
@@ -119,7 +119,7 @@ Sets the status code to return in response to rejected requests.
         }
     }
 
-## Support-black-and-white-list
+## black-and-white-list
 
 ###  White list rules
  ```redis-cli set whiteip ip```
