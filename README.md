@@ -26,7 +26,7 @@ The ngx_dynamic_limit_req_module module  is used to limit the request processing
 ## dynamic_limit_req_log_level
 * Syntax:	 dynamic_limit_req_log_level info | notice | warn | error;
 * Default: limit_req_log_level error;
-* Context: http, server, location, if
+* Context: http, server, location
 
 ## dynamic_limit_req_status 
 * Syntax:	 dynamic_limit_req_status code;
