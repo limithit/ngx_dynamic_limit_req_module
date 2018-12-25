@@ -2,7 +2,7 @@
  
 ## Introduction
 
-The *ngx_dynamic_limit_req_module* module is used to dynamic lock IP and release regularly.
+The *ngx_dynamic_limit_req_module* module is used to dynamically lock IP and release it periodically.
 
 Table of Contents
 =================
