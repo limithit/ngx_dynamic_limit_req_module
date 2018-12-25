@@ -14,12 +14,14 @@ Table of Contents
 The ngx_dynamic_limit_req_module module  is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.
 
 ## dynamic_limit_req
+Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
 ```
  Syntax:  dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
  Default: —
  Context: http, server, location, if
 ```
 ## dynamic_limit_req_zone
+Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted. 
 ```
  Syntax:  dynamic_limit_req_zone key zone=name:size rate=rate [sync]  redis=127.0.0.1 block_second=time;
  Default: —
@@ -27,6 +29,7 @@ The ngx_dynamic_limit_req_module module  is used to limit the request processing
  ```
 
 ## dynamic_limit_req_log_level
+Sets the desired logging level for cases when the server refuses to process requests due to rate exceeding, or delays request processing. Logging level for delays is one point less than for refusals; for example, if “dynamic_limit_req_log_level notice” is specified, delays are logged with the info level.
 ```
  Syntax:  dynamic_limit_req_log_level info | notice | warn | error;
  Default: limit_req_log_level error;
@@ -34,6 +37,7 @@ The ngx_dynamic_limit_req_module module  is used to limit the request processing
 ```
 
 ## dynamic_limit_req_status 
+Sets the status code to return in response to rejected requests.
 ```
  Syntax:  dynamic_limit_req_status code;
  Default: dynamic_limit_req_status 503;
@@ -42,7 +46,7 @@ The ngx_dynamic_limit_req_module module  is used to limit the request processing
 
      
 
-Configuration example：
+## Configuration example：
 
 
     worker_processes  2;
