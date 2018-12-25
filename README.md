@@ -12,6 +12,7 @@ Table of Contents
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
 * [Support-black-and-white-list](#Support-black-and-white-list)
 * [principle](#principle)
+* [Installation](#Installation)
 
 
 ## dynamic_limit_req
