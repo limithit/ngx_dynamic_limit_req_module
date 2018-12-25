@@ -3,7 +3,7 @@
 * The ngx_dynamic_limit_req_module module is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.
 ## Introduction
 
-The *ngx_dynamic_limit_req_module* is used to dynamic lock IP and release regularly.
+The *ngx_dynamic_limit_req_module* module is used to dynamic lock IP and release regularly.
 
 Table of Contents
 =================
