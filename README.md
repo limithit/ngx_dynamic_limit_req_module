@@ -34,7 +34,7 @@ Sets parameters for a shared memory zone that will keep states for various keys.
 Sets the desired logging level for cases when the server refuses to process requests due to rate exceeding, or delays request processing. Logging level for delays is one point less than for refusals; for example, if “dynamic_limit_req_log_level notice” is specified, delays are logged with the info level.
 ```
  Syntax:  dynamic_limit_req_log_level info | notice | warn | error;
- Default: limit_req_log_level error;
+ Default: dynamic_limit_req_log_level error;
  Context: http, server, location
 ```
 
