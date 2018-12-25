@@ -6,22 +6,14 @@ The *ngx_dynamic_limit_req_module* module is used to dynamic lock IP and release
 
 Table of Contents
 =================
-* [dynamic_limit_req](#dynamic_limit_req)
 * [dynamic_limit_req_zone](#dynamic_limit_req_zone)
+* [dynamic_limit_req](#dynamic_limit_req)
 * [dynamic_limit_req_log_level](#dynamic_limit_req_log_level)
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
 * [black-and-white-list](#black-and-white-list)
 * [principle](#principle)
 * [Installation](#Installation)
 
-
-## dynamic_limit_req
-Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
-```
- Syntax:  dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
- Default: —
- Context: http, server, location, if
-```
 ## dynamic_limit_req_zone
 Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted. 
 ```
@@ -29,6 +21,14 @@ Sets parameters for a shared memory zone that will keep states for various keys.
  Default: —
  Context: http
  ```
+ 
+## dynamic_limit_req
+Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
+```
+ Syntax:  dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
+ Default: —
+ Context: http, server, location, if
+```
 
 ## dynamic_limit_req_log_level
 Sets the desired logging level for cases when the server refuses to process requests due to rate exceeding, or delays request processing. Logging level for delays is one point less than for refusals; for example, if “dynamic_limit_req_log_level notice” is specified, delays are logged with the info level.
