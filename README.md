@@ -4,7 +4,6 @@
 
 The *ngx_dynamic_limit_req_module* is used to dynamic lock IP and release regularly.
 
-## Module ngx_dynamic_limit_req_module
 Table of Contents
 =================
 * [dynamic_limit_req](#dynamic_limit_req)
