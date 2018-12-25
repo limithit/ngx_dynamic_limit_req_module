@@ -4,6 +4,40 @@
 
 The *ngx_dynamic_limit_req_module* is used to dynamic lock IP and release regularly.
 
+## Module ngx_dynamic_limit_req_module
+Table of Contents
+=================
+* [dynamic_limit_req](#dynamic_limit_req)
+* [dynamic_limit_req_zone](#dynamic_limit_req_zone)
+* [dynamic_limit_req_log_level](#dynamic_limit_req_log_level)
+* [dynamic limit_req_status](#dynamic_limit_req_status)
+
+The ngx_dynamic_limit_req_module module  is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.
+
+## dynamic_limit_req
+
+* Syntax:	dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
+* Default:	—
+* Context:	http, server, location, if
+## dynamic_limit_req_zone
+* Syntax:	dynamic_limit_req_zone key zone=name:size rate=rate [sync];
+* Default:	—
+* Context:	http
+
+## dynamic_limit_req_log_level
+* Syntax:	dynamic_limit_req_log_level info | notice | warn | error;
+* Default:	
+* limit_req_log_level error;
+* Context:	http, server, location, if
+
+## dynamic_limit_req_status 
+* Syntax:	dynamic_limit_req_status code;
+* Default:	
+* dynamic_limit_req_status 503;
+* Context:	http, server, location, if
+
+     
+
 Configuration example：
 
 
