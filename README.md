@@ -13,7 +13,6 @@ Table of Contents
 * [Support-black-and-white-list](#Support-black-and-white-list)
 * [principle](#principle)
 
-The ngx_dynamic_limit_req_module module  is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.
 
 ## dynamic_limit_req
 Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
