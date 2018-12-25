@@ -10,6 +10,7 @@ Table of Contents
 * [dynamic_limit_req_zone](#dynamic_limit_req_zone)
 * [dynamic_limit_req_log_level](#dynamic_limit_req_log_level)
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
+* [Support-black-and-white-list](#Support-black-and-white-list)
 
 The ngx_dynamic_limit_req_module module  is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.
 
@@ -117,7 +118,7 @@ Sets the status code to return in response to rejected requests.
         }
     }
 
-## Support black-and-white list
+## Support-black-and-white-list
 
 ###  White list rules
  ```redis-cli set whiteip ip```
