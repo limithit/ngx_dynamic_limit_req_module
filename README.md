@@ -15,20 +15,20 @@ The ngx_dynamic_limit_req_module module  is used to limit the request processing
 
 ## dynamic_limit_req
 ```
- Syntax:	dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
+ Syntax:  dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
  Default: —
  Context: http, server, location, if
 ```
 ## dynamic_limit_req_zone
 ```
- Syntax:	dynamic_limit_req_zone key zone=name:size rate=rate [sync]  redis=127.0.0.1 block_second=time;
+ Syntax:  dynamic_limit_req_zone key zone=name:size rate=rate [sync]  redis=127.0.0.1 block_second=time;
  Default: —
  Context: http
  ```
 
 ## dynamic_limit_req_log_level
 ```
- Syntax:	dynamic_limit_req_log_level info | notice | warn | error;
+ Syntax:  dynamic_limit_req_log_level info | notice | warn | error;
  Default: limit_req_log_level error;
  Context: http, server, location
 ```
