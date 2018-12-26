@@ -13,6 +13,7 @@ Table of Contents
 * [black-and-white-list](#black-and-white-list)
 * [principle](#principle)
 * [Installation](#Installation)
+* [About](#About)
 
 ## dynamic_limit_req_zone
 Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted. 
@@ -155,6 +156,9 @@ Starting from NGINX 1.9.11, you can also compile this module as a dynamic module
 ```
 ## principle
 The ngx_dynamic_limit_req_module module is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.
+
+## About
+This module is an extension based on ngx_http_limit_req_module.
 
 ### If you want to use the api counting function, please use limithit-patch-1. Because not everyone needs this feature, so it doesn't merge into the trunk. Users who do not need this feature can skip this paragraph description.
 
