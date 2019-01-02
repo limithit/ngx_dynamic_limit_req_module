@@ -10,7 +10,7 @@
 #include <ngx_http.h>
 #include <hiredis/hiredis.h>
 
-u_char *redis_ip = NULL, *block_second;
+u_char *redis_ip = NULL, *block_second, *api_max = NULL, *mail_to = NULL;
 
 redisContext *c;
 redisReply *reply;
@@ -86,7 +86,7 @@ static ngx_command_t ngx_http_limit_req_commands[] = {
 		ngx_http_limit_req_zone, 0, 0, NULL },
 
 { ngx_string("dynamic_limit_req"), NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF
-		| NGX_HTTP_LOC_CONF | NGX_HTTP_LIF_CONF | NGX_CONF_TAKE123,
+		| NGX_HTTP_LOC_CONF | NGX_HTTP_LIF_CONF | NGX_CONF_TAKE123|NGX_CONF_TAKE5,
 		ngx_http_limit_req, NGX_HTTP_LOC_CONF_OFFSET, 0, NULL },
 
 { ngx_string("dynamic_limit_req_log_level"), NGX_HTTP_MAIN_CONF
@@ -199,6 +199,46 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 					&key);
 			continue;
 		}
+		ngx_str_t *s;
+			const char *url_time = "%.*s", *server_name = "%.*s", *document_url = "%.*s";
+			char D_time[256], Server_name[256], D_url[1024];
+			snprintf((char *) D_time, sizeof(D_time), url_time,
+					ngx_cached_http_log_time.len - 15,
+					ngx_cached_http_log_time.data);
+			s = (ngx_str_t *) ((char *) r + offsetof(ngx_http_request_t, uri));
+	 		snprintf((char *) Server_name, sizeof(Server_name), server_name,
+					r->headers_in.server.len, r->headers_in.server.data);
+	 		snprintf((char *) D_url, sizeof(D_url), document_url, s->len, s->data);
+			const char *fmt_base = "%.*s";
+			snprintf((char *) Host, sizeof(Host), fmt_base,
+					r->connection->addr_text.len, r->connection->addr_text.data);
+			if (!c->err) {
+				redisCommand(c, "SELECT 3");
+				redisCommand(c, "incr [%s]PV", D_time);
+				redisCommand(c, "pfadd [%s]Independent_IP %s", D_time, Host);
+				reply = redisCommand(c, "PFCOUNT [%s]Independent_IP", D_time);
+	                          if (reply->integer) {
+	                                redisCommand(c, "SET [%s]UV %d", D_time, reply->integer);
+	                         freeReplyObject(reply);
+	                        }
+	 			redisCommand(c, "incr [%s/%s]AllCount", D_time, Server_name);
+				redisCommand(c, "incr [%s/%s]%s", D_time, Server_name, D_url);
+			if (mail_to != NULL && api_max != NULL) {
+				reply = redisCommand(c, "get [%s/%s]%s", D_time, Server_name,
+						D_url);
+				char send_mail[256];
+				snprintf(send_mail, sizeof(send_mail), "echo API |mail -s 'maximum' %s >>/dev/null", (char *)mail_to);
+				if (atoi(reply->str) > atoi((char *)api_max)) {
+					system(send_mail);
+					ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+							"the integer =%s %d", reply->str, atoi(reply->str));
+					freeReplyObject(reply);
+				}
+			}
+				redisCommand(c, "SELECT 0");
+			}
+	 		ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "the url =%s",
+					D_url);
 
 		hash = ngx_crc32_short(key.data, key.len);
 
@@ -208,10 +248,6 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				(n == lrcf->limits.nelts - 1));
 
 		ngx_shmtx_unlock(&ctx->shpool->mutex);
-
-		const char *fmt_base = "%.*s";
-		snprintf((char *) Host, sizeof(Host), fmt_base,
-				r->connection->addr_text.len, r->connection->addr_text.data);
 
 		ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 				"limit_req[%ui]: %i %ui.%03ui %s", n, rc, excess / 1000,
@@ -917,6 +953,22 @@ ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			nodelay = 1;
 			continue;
 		}
+
+		if (ngx_strncmp(value[i].data, "mail_to=", 8) == 0) {
+
+					s.len = value[i].len;
+					mail_to = value[i].data + 8;
+
+					continue;
+				}
+
+		if (ngx_strncmp(value[i].data, "api_max=", 8) == 0) {
+
+			s.len = value[i].len;
+			api_max =value[i].data + 8;
+
+						continue;
+					}
 
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid parameter \"%V\"",
 				&value[i]);
