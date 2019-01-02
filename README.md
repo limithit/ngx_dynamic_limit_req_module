@@ -172,7 +172,7 @@ This module is an extension based on [ngx_http_limit_req_module](http://nginx.or
 ```
 git clone https://github.com/limithit/ngx_dynamic_limit_req_module.git
 cd ngx_dynamic_limit_req_module
-git checkout limithit-patch-1
+git checkout limithit-API_alerts
 ```
 ```
 root@debian:~# redis-cli 
