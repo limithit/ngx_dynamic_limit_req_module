@@ -227,13 +227,15 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				reply = redisCommand(c, "get [%s/%s]%s", D_time, Server_name,
 						D_url);
 				char send_mail[256];
-				snprintf(send_mail, sizeof(send_mail), "echo API |mail -s 'maximum' %s >>/dev/null", (char *)mail_to);
+				snprintf(send_mail, sizeof(send_mail),
+                                 "echo 'API_count=%s %s %s%s' |mail -s 'maximum' %s >>/dev/null",
+                                     reply->str, D_time, Server_name, D_url, (char *)mail_to);
 				if (atoi(reply->str) > atoi((char *)api_max)) {
 					system(send_mail);
 					ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 							"the integer =%s %d", reply->str, atoi(reply->str));
-					freeReplyObject(reply);
 				}
+					freeReplyObject(reply);
 			}
 				redisCommand(c, "SELECT 0");
 			}
