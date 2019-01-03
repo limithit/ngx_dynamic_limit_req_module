@@ -24,7 +24,7 @@ Sets parameters for a shared memory zone that will keep states for various keys.
  ```
  
 ## dynamic_limit_req
-Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
+Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero. Send e-mail only once in 5 minutes.
 ```
  Syntax:  dynamic_limit_req zone=name [burst=number] [nodelay | delay=number] mail_to=**@mail.com api_max=number;
      OR:  dynamic_limit_req zone=name [burst=number] [nodelay | delay=number];
