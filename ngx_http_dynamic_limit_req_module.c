@@ -237,9 +237,10 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 						timing = redisCommand(c, "SETEX %s %s %s", "wait_5_min",
 								"300", "Send e-mail only once in 5 minutes");
 						system(send_mail);
-						freeReplyObject(timing);
 					}
-
+					
+					freeReplyObject(timing);
+					
 					ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 							"the integer =%s %d", reply->str, atoi(reply->str));
 				}
