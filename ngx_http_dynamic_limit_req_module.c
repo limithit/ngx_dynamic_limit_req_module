@@ -13,7 +13,7 @@
 u_char *redis_ip = NULL, *block_second, *api_max = NULL, *mail_to = NULL;
 
 redisContext *c;
-redisReply *reply;
+redisReply *reply, *timing;
 
 typedef struct {
 	u_char color;
@@ -226,12 +226,20 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 			if (mail_to != NULL && api_max != NULL) {
 				reply = redisCommand(c, "get [%s/%s]%s", D_time, Server_name,
 						D_url);
+
 				char send_mail[256];
 				snprintf(send_mail, sizeof(send_mail),
                                  "echo 'API_count=%s %s %s%s' |mail -s 'maximum' %s >>/dev/null",
                                      reply->str, D_time, Server_name, D_url, (char *)mail_to);
-				if (atoi(reply->str) > atoi((char *)api_max)) {
-					system(send_mail);
+				if (atoi(reply->str) > atoi((char *) api_max)) {
+					timing = redisCommand(c, "GET %s", "wait_5_min");
+					if (timing->str == NULL) {
+						timing = redisCommand(c, "SETEX %s %s %s", "wait_5_min",
+								"300", "Send e-mail only once in 5 minutes");
+						system(send_mail);
+						freeReplyObject(timing);
+					}
+
 					ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 							"the integer =%s %d", reply->str, atoi(reply->str));
 				}
