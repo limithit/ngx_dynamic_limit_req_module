@@ -32,7 +32,6 @@ Sets the shared memory zone and the maximum burst size of requests. If the reque
  Context: http, server, location, if
  example:       if ($document_uri ~* "about"){
                      dynamic_limit_req zone=one burst=30 nodelay mail_to=123@qq.com api_max=200;
-                     dynamic_limit_req zone=one burst=30 nodelay;
                      dynamic_limit_req_status 405;
                   }
 
