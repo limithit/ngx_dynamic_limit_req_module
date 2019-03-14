@@ -163,6 +163,7 @@ This module is an extension based on [ngx_http_limit_req_module](http://nginx.or
 
 ## Extend
 This module can be works with [RedisPushIptables](https://github.com/limithit/RedisPushIptables),  the application layer matches then the network layer to intercept.
+
 ### If you want to use the api counting function, please use [limithit-API_alerts](https://github.com/limithit/ngx_dynamic_limit_req_module/tree/limithit-API_alerts). Because not everyone needs this feature, so it doesn't merge into the trunk. Users who do not need this feature can skip this paragraph description.
 
 ```
