@@ -14,7 +14,7 @@ Table of Contents
 * [principle](#principle)
 * [Installation](#Installation)
 * [About](#About)
-* [Extend](#Exten)
+* [Extend](#Extend)
 
 ## dynamic_limit_req_zone
 Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted. 
