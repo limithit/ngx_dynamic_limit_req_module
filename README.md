@@ -15,6 +15,7 @@ Table of Contents
 * [Installation](#Installation)
 * [About](#About)
 * [Extend](#Extend)
+* [Api-count](#Api-count)
 
 ## dynamic_limit_req_zone
 Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted. 
@@ -164,6 +165,7 @@ This module is an extension based on [ngx_http_limit_req_module](http://nginx.or
 ## Extend
 This module can be works with [RedisPushIptables](https://github.com/limithit/RedisPushIptables),  the application layer matches then the network layer to intercept.
 
+## Api-count
 ### If you want to use the api counting function, please use [limithit-API_alerts](https://github.com/limithit/ngx_dynamic_limit_req_module/tree/limithit-API_alerts). Because not everyone needs this feature, so it doesn't merge into the trunk. Users who do not need this feature can skip this paragraph description.
 
 ```
