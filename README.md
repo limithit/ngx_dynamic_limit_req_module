@@ -142,6 +142,8 @@ Sets the status code to return in response to rejected requests.
     cd redis-4.0**version**/deps/hiredis
     make 
     make install 
+    echo /usr/local/lib >> /etc/ld.so.conf
+    ldconfig
     
     cd nginx-**version**
     ./configure --add-module=/path/to/this/ngx_dynamic_limit_req_module 
