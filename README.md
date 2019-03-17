@@ -163,7 +163,7 @@ The ngx_dynamic_limit_req_module module is used to limit the request processing 
 This module is an extension based on [ngx_http_limit_req_module](http://nginx.org/en/docs/http/ngx_http_limit_req_module.html).
 
 ## Extend
-This module can be works with [RedisPushIptables](https://github.com/limithit/RedisPushIptables),  the application layer matches then the network layer to intercept. Although network layer interception will save resources, there are also deficiencies. Assume that only one specific interface is filtered and no other interfaces are filtered. If it is controlled at the network layer, it cannot be implemented, but it can be precisely controlled at the application layer. Users need to weigh which solution is more suitable for the event at the time.
+This module can be works with [RedisPushIptables](https://github.com/limithit/RedisPushIptables),  the application layer matches then the network layer to intercept. Although network layer interception will save resources, there are also deficiencies. Assuming that only one specific interface is filtered and no other interfaces are filtered, those that do not need to be filtered will also be inaccessible. Although precise control is not possible at the network layer or the transport layer, it can be precisely controlled at the application layer. Users need to weigh which solution is more suitable for the event at the time.
 
 ## Api-count
 ### If you want to use the api counting function, please use [limithit-API_alerts](https://github.com/limithit/ngx_dynamic_limit_req_module/tree/limithit-API_alerts). Because not everyone needs this feature, so it doesn't merge into the trunk. Users who do not need this feature can skip this paragraph description.
