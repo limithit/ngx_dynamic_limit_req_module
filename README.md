@@ -74,7 +74,7 @@ Sets the status code to return in response to rejected requests.
             server_name  localhost;
             location / {
                 
-                if ($http_x_forwarded_host) {
+                if ($http_x_forwarded_for) {
                  return 400;
                 }
                 root   html;
