@@ -160,6 +160,8 @@ Sets the status code to return in response to rejected requests.
     }
 ```
 
+About [ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_module.html)
+
 ## black-and-white-list
 
 ###  White list rules
