@@ -140,7 +140,8 @@ Sets the status code to return in response to rejected requests.
        set_real_ip_from 192.168.16.0/24;
        real_ip_header X-Forwarded-For;
        real_ip_recursive on;
-
+        
+        #### $http_x_forwarded_for or $binary_remote_addr
         dynamic_limit_req_zone $http_x_forwarded_for zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
         server {
             listen       80;
