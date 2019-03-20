@@ -121,6 +121,44 @@ Sets the status code to return in response to rejected requests.
             }
         }
     }
+    
+    
+## If you use CDN at the source station :
+```
+ worker_processes  2;
+    events {
+        worker_connections  1024;
+    }
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+        sendfile        on;
+        keepalive_timeout  65;
+        
+       ####--with-http_realip_module  
+       
+       set_real_ip_from 192.168.16.0/24;
+       real_ip_header X-Forwarded-For;
+       real_ip_recursive on;
+
+        dynamic_limit_req_zone $http_x_forwarded_for zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
+        server {
+            listen       80;
+            server_name  localhost;
+            location / {
+                root   html;
+                index  index.html index.htm;
+                dynamic_limit_req zone=one burst=100 nodelay;
+                dynamic_limit_req_status 403;
+            }
+            error_page   403 500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   html;
+            }
+        }
+
+    }
+```
 
 ## black-and-white-list
 
