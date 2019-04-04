@@ -52,7 +52,7 @@ Sets the status code to return in response to rejected requests.
      
 
 ## Configuration example：
-
+```nginx
 
     worker_processes  2;
     events {
@@ -121,10 +121,11 @@ Sets the status code to return in response to rejected requests.
             }
         }
     }
-    
+   
+```
     
 ## If you use CDN at the source station :
-```
+```nginx
  worker_processes  2;
     events {
         worker_connections  1024;
@@ -211,12 +212,12 @@ This module can be works with [RedisPushIptables](https://github.com/limithit/Re
 ## Api-count
 ### If you want to use the api counting function, please use [limithit-API_alerts](https://github.com/limithit/ngx_dynamic_limit_req_module/tree/limithit-API_alerts). Because not everyone needs this feature, so it doesn't merge into the trunk. Users who do not need this feature can skip this paragraph description.
 
-```
+``` 
 git clone https://github.com/limithit/ngx_dynamic_limit_req_module.git
 cd ngx_dynamic_limit_req_module
 git checkout limithit-API_alerts
 ```
-```
+``` 
 root@debian:~# redis-cli 
 127.0.0.1:6379> SELECT 3
 127.0.0.1:6379[3]> scan 0 match *12/Dec/2018* count 10000 
