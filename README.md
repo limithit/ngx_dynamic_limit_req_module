@@ -64,9 +64,9 @@ Sets the status code to return in response to rejected requests.
         sendfile        on;
         keepalive_timeout  65;
         
-        dynamic_limit_req_zone $binary_remote_addr zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
-        dynamic_limit_req_zone $binary_remote_addr zone=two:10m rate=50r/s redis=127.0.0.1 block_second=600;
-        dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=127.0.0.1 block_second=1800;
+   dynamic_limit_req_zone $binary_remote_addr zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
+   dynamic_limit_req_zone $binary_remote_addr zone=two:10m rate=50r/s redis=127.0.0.1 block_second=600;
+   dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=127.0.0.1 block_second=1800;
         
         
         server {
