@@ -210,9 +210,8 @@ This module is an extension based on [ngx_http_limit_req_module](http://nginx.or
 ## Donate
 The developers work tirelessly to improve and develop ngx_dynamic_limit_req_module. Many hours have been put in to provide the software as it is today, but this is an extremely time-consuming process with no financial reward. If you enjoy using the software, please consider donating to the devs, so they can spend more time implementing improvements.
 
-### Alipay
-zhibu1991@gmail.com 
-
+ ### @Gandalf
+![Alipay](https://github.com/limithit/shellcode/blob/master/WechatIMG17.jpeg)
 
 ## Extend
 This module can be works with [RedisPushIptables](https://github.com/limithit/RedisPushIptables),  the application layer matches then the network layer to intercept. Although network layer interception will save resources, there are also deficiencies. Assuming that only one specific interface is filtered and no other interfaces are filtered, those that do not need to be filtered will also be inaccessible. Although precise control is not possible at the network layer or the transport layer, it can be precisely controlled at the application layer. Users need to weigh which solution is more suitable for the event at the time.
