@@ -169,7 +169,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 					/* Redis if the connection is wrong,
 					 *  it does not intercept,
 					 *   and returns normally */
-					return NGX_OK;
+					return NGX_DECLINED;
 				} else {
 					ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
 							"redis connection error: can't allocate redis context\n");
@@ -246,7 +246,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 		reply = redisCommand(c, "GET %s", Host);
 		if (reply->str == NULL) {
 			freeReplyObject(reply);
-			return NGX_OK;
+			return NGX_DECLINED;
 		}
 	}
 	/* return http_status redis*/
