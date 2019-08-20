@@ -215,10 +215,10 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 			if (!c->err) {
 				redisCommand(c, "SELECT 3");
 				redisCommand(c, "incr [%s]PV", D_time);
-				redisCommand(c, "pfadd [%s/%s]Independent_IP %s", Server_name, D_time, Host);
-				reply = redisCommand(c, "PFCOUNT [%s/%s]Independent_IP", Server_name, D_time);
+				redisCommand(c, "pfadd [%s/%s]Independent_IP %s",  D_time, Server_name, Host);
+				reply = redisCommand(c, "PFCOUNT [%s/%s]Independent_IP",  D_time, Server_name,);
 	                          if (reply->integer) {
-	                                redisCommand(c, "SET [%s/%s]UV %d", Server_name, D_time, reply->integer);
+	                                redisCommand(c, "SET [%s/%s]UV %d", D_time, Server_name, reply->integer);
 	                         freeReplyObject(reply);
 	                        }
 	 			redisCommand(c, "incr [%s/%s]AllCount", D_time, Server_name);
