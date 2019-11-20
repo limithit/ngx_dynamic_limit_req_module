@@ -139,9 +139,15 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	ngx_http_limit_req_conf_t *lrcf;
 	ngx_http_limit_req_limit_t *limit, *limits;
 
-	if (r->main->limit_req_set) {
-		return NGX_DECLINED;
-	}
+#if nginx_version >= 1017006
+        if (r->main->limit_req_status) {
+	        return NGX_DECLINED;
+        }
+#else   
+        if (r->main->limit_req_set) {
+	        return NGX_DECLINED;
+        }
+#endif  
 
 	lrcf = ngx_http_get_module_loc_conf(r, ngx_http_dynamic_limit_req_module);
 	limits = lrcf->limits.elts;
@@ -239,8 +245,12 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	if (rc == NGX_DECLINED) {
 		return NGX_DECLINED;
 	}
-
+      
+#if nginx_version >= 1017006
+	r->main->limit_req_status = 1;
+#else   
 	r->main->limit_req_set = 1;
+#endif  
 
 	if (!c->err) {
 		reply = redisCommand(c, "GET %s", Host);
