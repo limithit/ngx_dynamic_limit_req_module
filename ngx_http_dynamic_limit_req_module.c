@@ -10,10 +10,11 @@
 #include <ngx_http.h>
 #include <hiredis/hiredis.h>
 
-u_char *redis_ip = NULL, *block_second;
-
-redisContext *c;
-redisReply *reply;
+static u_char *redis_ip = NULL, *block_second;
+static u_char *redis_port = NULL, *redis_pass = NULL, *redis_socket = NULL;
+static ngx_uint_t isunix;
+static redisContext *c;
+static redisReply *reply;
 
 typedef struct {
 	u_char color;
@@ -69,6 +70,8 @@ static char *ngx_http_limit_req_merge_conf(ngx_conf_t *cf, void *parent,
 		void *child);
 static char *ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd,
 		void *conf);
+static char *ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd,
+		void *conf);
 static char *ngx_http_limit_req(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_http_limit_req_init(ngx_conf_t *cf);
 
@@ -84,6 +87,9 @@ static ngx_command_t ngx_http_limit_req_commands[] = {
 
 { ngx_string("dynamic_limit_req_zone"), NGX_HTTP_MAIN_CONF | NGX_CONF_TAKE5,
 		ngx_http_limit_req_zone, 0, 0, NULL },
+
+{ ngx_string("dynamic_limit_req_redis"), NGX_HTTP_MAIN_CONF | NGX_CONF_TAKE123,
+		ngx_http_limit_req_redis, 0, 0, NULL },
 
 { ngx_string("dynamic_limit_req"), NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF
 		| NGX_HTTP_LOC_CONF | NGX_HTTP_LIF_CONF | NGX_CONF_TAKE123,
@@ -164,7 +170,15 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 
 	if (c == NULL) {
-		c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
+		if (isunix) {
+			c = redisConnectUnixWithTimeout((char*) redis_ip, timeout);
+		} else {
+			if (redis_port != NULL) {
+				c = redisConnectWithTimeout((char*) redis_ip, atoi((char*)redis_port),	timeout);
+			} else {
+				c = redisConnectWithTimeout((char*) redis_ip, 6379, timeout);
+			}
+		}
 		if (c == NULL || c->err) {
 				if (c) {
 					if (redis_ip) {
@@ -181,6 +195,15 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 							"redis connection error: can't allocate redis context\n");
 				}
 			}
+		if (redis_pass != NULL) {
+			reply = redisCommand(c, "AUTH %s", (char*)redis_pass);
+			if (reply->type == REDIS_REPLY_ERROR) {
+				ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
+						"redis requirepass wrong: %s\n", c->errstr, redis_pass);
+				/* Authentication failed */
+			}
+			freeReplyObject(reply);
+		}
 	}
 
 
@@ -876,6 +899,75 @@ ngx_http_limit_req_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 	shm_zone->init = ngx_http_limit_req_init_zone;
 	shm_zone->data = ctx;
 
+	return NGX_CONF_OK;
+}
+
+static char *
+ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
+
+	ngx_str_t *value;
+	ngx_uint_t i;
+
+	ngx_http_limit_req_ctx_t *ctx;
+	ngx_http_compile_complex_value_t ccv;
+
+	value = cf->args->elts;
+
+	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_req_ctx_t));
+	if (ctx == NULL) {
+		return NGX_CONF_ERROR ;
+	}
+
+	ngx_memzero(&ccv, sizeof(ngx_http_compile_complex_value_t));
+
+	ccv.cf = cf;
+	ccv.value = &value[1];
+	ccv.complex_value = &ctx->key;
+
+	if (ngx_http_compile_complex_value(&ccv) != NGX_OK) {
+		return NGX_CONF_ERROR ;
+	}
+
+	for (i = 1; i < cf->args->nelts; i++) {
+
+		if (!ngx_strncmp(value[i].data, "port=", 5)) {
+
+			redis_port = value[i].data + 5;
+
+			continue;
+		}
+
+		if (!ngx_strncmp(value[i].data, "requirepass=", 12)) {
+
+			redis_pass = value[i].data + 12;
+
+			continue;
+		}
+
+		if (!ngx_strncmp(value[i].data, "unix_socket=", 12)) {
+
+			redis_socket = value[i].data + 12;
+
+		    if (!ngx_strcasecmp(redis_socket, (u_char *) "on")) {
+		    	isunix = 1;
+
+		    } else if (!ngx_strcasecmp(redis_socket, (u_char *) "off")) {
+		    	isunix = 0;
+
+		    } else {
+		        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+		                     "invalid value \"%s\" in \"%s\" directive, "
+		                     "it must be \"on\" or \"off\"",
+		                     value[1].data, cmd->name.data);
+		        return NGX_CONF_ERROR;
+		    }
+		    continue;
+		}
+
+		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid parameter \"%V\"",
+				&value[i]);
+		return NGX_CONF_ERROR ;
+	}
 	return NGX_CONF_OK;
 }
 
