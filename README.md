@@ -39,7 +39,7 @@ redis-ser 35277 root    9u     unix 0x0000000079e14d80      0t0 1852607 /tmp/red
 
 ```
 ```
- Syntax:  dynamic_limit_req_redis  unix_socket=on/off port=[number] requirepass=[password];
+ Syntax:  dynamic_limit_req_redis  unix_socket port=[number] requirepass=[password];
  Default: —
  Context: http
  ```
