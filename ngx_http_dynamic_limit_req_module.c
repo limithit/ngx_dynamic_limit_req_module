@@ -11,8 +11,8 @@
 #include <hiredis/hiredis.h>
 
 static u_char *redis_ip = NULL, *block_second;
-static u_char *redis_port = NULL, *redis_pass = NULL, *redis_socket = NULL;
-static ngx_uint_t isunix;
+static u_char *redis_port = NULL, *redis_pass = NULL;
+static ngx_uint_t isunix=0;
 static redisContext *c;
 static redisReply *reply;
 
@@ -944,23 +944,8 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 			continue;
 		}
 
-		if (!ngx_strncmp(value[i].data, "unix_socket=", 12)) {
-
-			redis_socket = value[i].data + 12;
-
-		    if (!ngx_strcasecmp(redis_socket, (u_char *) "on")) {
+		if (!ngx_strcmp(value[i].data, "unix_socket")) {
 		    	isunix = 1;
-
-		    } else if (!ngx_strcasecmp(redis_socket, (u_char *) "off")) {
-		    	isunix = 0;
-
-		    } else {
-		        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-		                     "invalid value \"%s\" in \"%s\" directive, "
-		                     "it must be \"on\" or \"off\"",
-		                     value[1].data, cmd->name.data);
-		        return NGX_CONF_ERROR;
-		    }
 		    continue;
 		}
 
