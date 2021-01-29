@@ -28,6 +28,10 @@ Sets parameters for a shared memory zone that will keep states for various keys.
  ```
 ## dynamic_limit_req_redis
 Sets optional parameters, unix_socket, port, requirepass.
+
+The socket must be accessible for www-data. You first have to change the chmod of the socket to 770 that the redis group can access it, make changes in `/etc/redis/redis.conf`:
+`unixsocketperm 770` `unixsocket /tmp/redis.sock` and then add `nginx` to the redis group `usermod -g redis nginx`
+
 ```
  Syntax:  dynamic_limit_req_redis  unix_socket | port=[number] requirepass=[password];
  Default: port 6379
