@@ -7,6 +7,7 @@ The *ngx_dynamic_limit_req_module* module is used to dynamically lock IP and rel
 Table of Contents
 =================
 * [dynamic_limit_req_zone](#dynamic_limit_req_zone)
+* [dynamic_limit_req_redis](#dynamic_limit_req_redis)
 * [dynamic_limit_req](#dynamic_limit_req)
 * [dynamic_limit_req_log_level](#dynamic_limit_req_log_level)
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
@@ -25,7 +26,31 @@ Sets parameters for a shared memory zone that will keep states for various keys.
  Default: —
  Context: http
  ```
- 
+## dynamic_limit_req_redis
+Sets optional parameters, unix_socket, port, requirepass.
+
+The socket must be accessible for nginx. You first have to change the chmod of the socket to 770 that the redis group can access it, make changes in `/etc/redis/redis.conf`:
+`unixsocketperm 770` `unixsocket /tmp/redis.sock` and then add `nginx` to the redis group `usermod -g redis nginx`
+
+```
+ Syntax:  dynamic_limit_req_redis  unix_socket | port=[number] requirepass=[password];
+ Default: port 6379
+ Context: http
+ ```
+example:
+```
+dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=/tmp/redis.sock block_second=1800;
+dynamic_limit_req zone=sms burst=3 nodelay;
+dynamic_limit_req_redis unix_socket requirepass=comeback;
+```
+`or required for non-standard ports, not required for standard port 6379`
+```
+dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=127.0.0.1 block_second=1800;
+dynamic_limit_req zone=sms burst=3 nodelay;
+dynamic_limit_req_redis port=6378 requirepass=comeback;
+
+```
+
 ## dynamic_limit_req
 Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
 ```
