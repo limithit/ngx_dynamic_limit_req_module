@@ -186,9 +186,6 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 								"redis connection error: %s %s\n", c->errstr,
 								redis_ip ? redis_ip : (u_char * )"[ No configuration of redis]");
 					}
-					/* Redis if the connection is wrong,
-					 *  it does not intercept,
-					 *   and returns normally */
 					return NGX_DECLINED;
 				} else {
 					ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
@@ -199,7 +196,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 			reply = redisCommand(c, "AUTH %s", (char*)redis_pass);
 			if (reply->type == REDIS_REPLY_ERROR) {
 				ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-						"redis requirepass wrong: %s\n", c->errstr, redis_pass);
+						"redis requirepass wrong: %s %s\n", c->errstr, redis_pass);
 				/* Authentication failed */
 			}
 			freeReplyObject(reply);

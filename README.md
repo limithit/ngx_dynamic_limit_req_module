@@ -29,7 +29,7 @@ Sets parameters for a shared memory zone that will keep states for various keys.
 ## dynamic_limit_req_redis
 Sets optional parameters, unix_socket, port, requirepass.
 ```
- Syntax:  dynamic_limit_req_redis  unix_socket | port=[number] default requirepass=[password];
+ Syntax:  dynamic_limit_req_redis  unix_socket | port=[number] requirepass=[password];
  Default: port 6379
  Context: http
  ```
