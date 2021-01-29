@@ -27,19 +27,19 @@ Sets parameters for a shared memory zone that will keep states for various keys.
  Context: http
  ```
 ## dynamic_limit_req_redis
+```
+ Syntax:  dynamic_limit_req_redis  unix_socket port=[number] requirepass=[password];
+ Default: —
+ Context: http
+ ```
 Set optional parameters, unix_socket, port, requirepass，example:
 ```
 dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=/tmp/redis.sock block_second=1800;
 dynamic_limit_req zone=sms burst=3 nodelay;
 dynamic_limit_req_redis unix_socket requirepass=comeback;
 
+```
 
-```
-```
- Syntax:  dynamic_limit_req_redis  unix_socket port=[number] requirepass=[password];
- Default: —
- Context: http
- ```
 ## dynamic_limit_req
 Sets the shared memory zone and the maximum burst size of requests. If the requests rate exceeds the rate configured for a zone, their processing is delayed such that requests are processed at a defined rate. Excessive requests are delayed until their number exceeds the maximum burst size in which case the request is terminated with an error. By default, the maximum burst size is equal to zero.
 ```
