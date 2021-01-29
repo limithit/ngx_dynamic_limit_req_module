@@ -27,16 +27,24 @@ Sets parameters for a shared memory zone that will keep states for various keys.
  Context: http
  ```
 ## dynamic_limit_req_redis
+Sets optional parameters, unix_socket, port, requirepass.
 ```
- Syntax:  dynamic_limit_req_redis  unix_socket port=[number] requirepass=[password];
- Default: —
+ Syntax:  dynamic_limit_req_redis  unix_socket | port=[number] default requirepass=[password];
+ Default: port 6379
  Context: http
  ```
-Set optional parameters, unix_socket, port, requirepass，example:
+example:
 ```
 dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=/tmp/redis.sock block_second=1800;
 dynamic_limit_req zone=sms burst=3 nodelay;
 dynamic_limit_req_redis unix_socket requirepass=comeback;
+```
+or
+Required for non-standard ports, not required for standard port 6379
+```
+dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=127.0.0.1 block_second=1800;
+dynamic_limit_req zone=sms burst=3 nodelay;
+dynamic_limit_req_redis port=6378 requirepass=comeback;
 
 ```
 
