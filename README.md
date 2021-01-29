@@ -7,6 +7,7 @@ The *ngx_dynamic_limit_req_module* module is used to dynamically lock IP and rel
 Table of Contents
 =================
 * [dynamic_limit_req_zone](#dynamic_limit_req_zone)
+* [dynamic_limit_req_redis](#dynamic_limit_req_redis)
 * [dynamic_limit_req](#dynamic_limit_req)
 * [dynamic_limit_req_log_level](#dynamic_limit_req_log_level)
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
