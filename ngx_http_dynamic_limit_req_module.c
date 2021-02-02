@@ -910,6 +910,10 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 	value = cf->args->elts;
 
+	if (isunix) {
+		return "dynamic_limit_req_redis is duplicate";
+	}
+
 	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_req_ctx_t));
 	if (ctx == NULL) {
 		return NGX_CONF_ERROR ;
@@ -946,8 +950,15 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 		    continue;
 		}
 
+
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid parameter \"%V\"",
 				&value[i]);
+		return NGX_CONF_ERROR ;
+	}
+	if (redis_port && isunix == 1) {
+		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+				"Only one variable can be selected"
+						"for unix_socket or port");
 		return NGX_CONF_ERROR ;
 	}
 	return NGX_CONF_OK;
