@@ -12,7 +12,7 @@
 
 static u_char *redis_ip = NULL, *block_second;
 static u_char *redis_port = NULL, *redis_pass = NULL;
-static ngx_uint_t isunix=0;
+static ngx_uint_t isunix = 0, req_redis = 0;
 static redisContext *c;
 static redisReply *reply;
 
@@ -183,7 +183,7 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 				if (c) {
 					if (redis_ip) {
 						ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-								"redis connection error: %s %s\n", c->errstr,
+								"redis connection error: %s %s", c->errstr,
 								redis_ip ? redis_ip : (u_char * )"[ No configuration of redis]");
 					}
 					return NGX_DECLINED;
@@ -910,10 +910,6 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 	value = cf->args->elts;
 
-	if (isunix) {
-		return "dynamic_limit_req_redis is duplicate";
-	}
-
 	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_req_ctx_t));
 	if (ctx == NULL) {
 		return NGX_CONF_ERROR ;
@@ -929,8 +925,14 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 		return NGX_CONF_ERROR ;
 	}
 
-	for (i = 1; i < cf->args->nelts; i++) {
-
+	for (i = 0; i < cf->args->nelts; i++) {
+		if (!ngx_strncmp(value[i].data, "dynamic_limit_req_redis", 24)) {
+			req_redis= req_redis + 1;
+				if (req_redis == 2) {
+					return "dynamic_limit_req_redis is duplicate";
+				}
+			continue;
+		}
 		if (!ngx_strncmp(value[i].data, "port=", 5)) {
 
 			redis_port = value[i].data + 5;
@@ -955,6 +957,7 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 				&value[i]);
 		return NGX_CONF_ERROR ;
 	}
+
 	if (redis_port && isunix == 1) {
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 				"Only one variable can be selected"
