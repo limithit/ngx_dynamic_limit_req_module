@@ -12,7 +12,7 @@
 
 static u_char *redis_ip = NULL, *block_second;
 static u_char *redis_port = NULL, *redis_pass = NULL;
-static ngx_uint_t isunix = 0, req_redis = 0;
+static ngx_uint_t isunix=0;
 static redisContext *c;
 static redisReply *reply;
 
@@ -925,14 +925,8 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 		return NGX_CONF_ERROR ;
 	}
 
-	for (i = 0; i < cf->args->nelts; i++) {
-		if (!ngx_strncmp(value[i].data, "dynamic_limit_req_redis", 24)) {
-			req_redis= req_redis + 1;
-				if (req_redis == 2) {
-					return "dynamic_limit_req_redis is duplicate";
-				}
-			continue;
-		}
+	for (i = 1; i < cf->args->nelts; i++) {
+
 		if (!ngx_strncmp(value[i].data, "port=", 5)) {
 
 			redis_port = value[i].data + 5;
@@ -957,7 +951,6 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 				&value[i]);
 		return NGX_CONF_ERROR ;
 	}
-
 	if (redis_port && isunix == 1) {
 		ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
 				"Only one variable can be selected"
