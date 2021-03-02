@@ -12,9 +12,13 @@
 
 static u_char *redis_ip = NULL, *block_second;
 static u_char *redis_port = NULL, *redis_pass = NULL;
-static ngx_uint_t isunix=0;
+static ngx_uint_t isunix = 0, only_one = 0;
 static redisContext *c;
 static redisReply *reply;
+
+typedef struct {
+  ngx_str_t *redis_conf;
+} ngx_http_limit_redis_t;
 
 typedef struct {
 	u_char color;
@@ -904,11 +908,18 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 	ngx_str_t *value;
 	ngx_uint_t i;
-
+	ngx_http_limit_redis_t *only = conf;
 	ngx_http_limit_req_ctx_t *ctx;
 	ngx_http_compile_complex_value_t ccv;
 
 	value = cf->args->elts;
+
+	if (!only) {
+		only_one = only_one + 1;
+	}
+	if (only_one > 1) {
+		return "is duplicate";
+	}
 
 	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_req_ctx_t));
 	if (ctx == NULL) {
@@ -930,7 +941,11 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 		if (!ngx_strncmp(value[i].data, "port=", 5)) {
 
 			redis_port = value[i].data + 5;
-
+			if (atoi((char *)redis_port) <= 0) {
+						ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+								"invalid redis port \"%V\"", &value[i]);
+						return NGX_CONF_ERROR ;
+					}
 			continue;
 		}
 
