@@ -12,7 +12,7 @@
 
 static u_char *redis_ip = NULL, *block_second;
 static u_char *redis_port = NULL, *redis_pass = NULL;
-static ngx_uint_t isunix = 0, only_one = 0;
+static ngx_uint_t isunix = 0;
 static redisContext *c;
 static redisReply *reply;
 
@@ -908,18 +908,11 @@ ngx_http_limit_req_redis(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
 
 	ngx_str_t *value;
 	ngx_uint_t i;
-	ngx_http_limit_redis_t *only = conf;
+
 	ngx_http_limit_req_ctx_t *ctx;
 	ngx_http_compile_complex_value_t ccv;
 
 	value = cf->args->elts;
-
-	if (!only) {
-		only_one = only_one + 1;
-	}
-	if (only_one > 1) {
-		return "is duplicate";
-	}
 
 	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_req_ctx_t));
 	if (ctx == NULL) {
