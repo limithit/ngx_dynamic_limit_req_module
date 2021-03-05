@@ -17,10 +17,6 @@ static redisContext *c;
 static redisReply *reply;
 
 typedef struct {
-  ngx_str_t *redis_conf;
-} ngx_http_limit_redis_t;
-
-typedef struct {
 	u_char color;
 	u_char dummy;
 	u_short len;
