@@ -283,10 +283,9 @@ static ngx_int_t ngx_http_limit_req_handler(ngx_http_request_t *r) {
 	if (!c->err) {
 		if (!ngx_strcmp((char * ) Host, reply->str)) {
 			ngx_log_error(lrcf->limit_log_level, r->connection->log, 0,
-					"limiting requests, excess: %ui.%03ui by zone \"%V\" lock=%s length=%d",
-					excess / 1000, excess % 1000, &limit->shm_zone->shm.name,
-					(char * )Host, strlen((char * )Host));
-
+                          "limiting requests, excess: %ui.%03ui by zone \"%V\"",
+                          excess / 1000, excess % 1000,
+                          &limit->shm_zone->shm.name); 
 			ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
 					"limit_lock]: by zone=\"%V\" ip=%s ip2=%V len=%d len2=%d ",
 					&limit->shm_zone->shm.name, (char * )Host,
