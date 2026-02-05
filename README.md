@@ -1,5 +1,5 @@
 ﻿# ngx_dynamic_limit_req_module
- 
+
 ## Introduction
 
 The *ngx_dynamic_limit_req_module* module is used to dynamically lock IP and release it periodically.
@@ -13,6 +13,7 @@ Table of Contents
 * [dynamic_limit_req_status](#dynamic_limit_req_status)
 * [black-and-white-list](#black-and-white-list)
 * [principle](#principle)
+* [Pre-built Packages (Ubuntu / Debian)](#pre-built-packages-ubuntu--debian)
 * [Installation](#Installation)
 * [About](#About)
 * [Donate](#Donate)
@@ -20,7 +21,7 @@ Table of Contents
 * [Api-count](#Api-count)
 
 ## dynamic_limit_req_zone
-Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted. 
+Sets parameters for a shared memory zone that will keep states for various keys. In particular, the state stores the current number of excessive requests. The key can contain text, variables, and their combination. Requests with an empty key value are not accounted.
 ```
  Syntax:  dynamic_limit_req_zone key zone=name:size rate=rate [sync]  redis=127.0.0.1 block_second=time;
  Default: —
@@ -67,7 +68,7 @@ Sets the desired logging level for cases when the server refuses to process requ
  Context: http, server, location
 ```
 
-## dynamic_limit_req_status 
+## dynamic_limit_req_status
 Sets the status code to return in response to rejected requests.
 ```
  Syntax:  dynamic_limit_req_status code;
@@ -75,7 +76,7 @@ Sets the status code to return in response to rejected requests.
  Context: http, server, location, if
 ```
 
-     
+
 
 ## Configuration example：
 ```nginx
@@ -89,17 +90,17 @@ Sets the status code to return in response to rejected requests.
         default_type  application/octet-stream;
         sendfile        on;
         keepalive_timeout  65;
-        
+
    dynamic_limit_req_zone $binary_remote_addr zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
    dynamic_limit_req_zone $binary_remote_addr zone=two:10m rate=50r/s redis=127.0.0.1 block_second=600;
    dynamic_limit_req_zone $binary_remote_addr zone=sms:5m rate=5r/m redis=127.0.0.1 block_second=1800;
-        
-        
+
+
         server {
             listen       80;
             server_name  localhost;
             location / {
-                
+
                 if ($http_x_forwarded_for) {
                  return 400;
                 }
@@ -118,8 +119,8 @@ Sets the status code to return in response to rejected requests.
             server_name  localhost2;
             location / {
                 root   html;
-                index  index.html index.htm; 
-                
+                index  index.html index.htm;
+
                     set $flag 0;
                    if ($document_uri ~* "regist"){
                       set $flag "${flag}1";
@@ -132,7 +133,7 @@ Sets the status code to return in response to rejected requests.
                       dynamic_limit_req_status 403;
                       }
 
-                
+
                       if ($document_uri ~* "getSmsVerifyCode.do"){
                       dynamic_limit_req zone=sms burst=5 nodelay;
                       dynamic_limit_req_status 444;
@@ -147,9 +148,9 @@ Sets the status code to return in response to rejected requests.
             }
         }
     }
-   
+
 ```
-    
+
 ## If you use CDN at the source station :
 ```nginx
  worker_processes  2;
@@ -161,13 +162,13 @@ Sets the status code to return in response to rejected requests.
         default_type  application/octet-stream;
         sendfile        on;
         keepalive_timeout  65;
-        
-       ####--with-http_realip_module  
-       
+
+       ####--with-http_realip_module
+
        set_real_ip_from 192.168.16.0/24;
        real_ip_header X-Forwarded-For;
        real_ip_recursive on;
-        
+
    #### $http_x_forwarded_for or $binary_remote_addr
   dynamic_limit_req_zone $http_x_forwarded_for zone=one:10m rate=100r/s redis=127.0.0.1 block_second=300;
         server {
@@ -194,27 +195,47 @@ About [ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_mod
 
 ###  White list rules
  ```redis-cli set whiteip ip```
- 
+
  example：
  ```redis-cli set white192.168.1.1 192.168.1.1```
-###  Black list rules 
+###  Black list rules
  ```redis-cli set ip ip ```
- 
+
  example：
  ```redis-cli set 192.168.1.2 192.168.1.2```
- 
+
+## Pre-built Packages (Ubuntu / Debian)
+
+Pre-built packages for this module are freely available from the GetPageSpeed repository:
+
+```bash
+# Install the repository keyring
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://extras.getpagespeed.com/deb-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/getpagespeed.gpg >/dev/null
+
+# Add the repository (Ubuntu example - replace 'ubuntu' and 'jammy' for your distro)
+echo "deb [signed-by=/etc/apt/keyrings/getpagespeed.gpg] https://extras.getpagespeed.com/ubuntu jammy main" \
+  | sudo tee /etc/apt/sources.list.d/getpagespeed-extras.list
+
+# Install nginx and the module
+sudo apt-get update
+sudo apt-get install nginx nginx-module-dynamic-limit-req
+```
+
+The module is automatically enabled after installation. Supported distributions include Debian 12/13 and Ubuntu 20.04/22.04/24.04 (both amd64 and arm64). See [the complete setup instructions](https://apt-nginx-extras.getpagespeed.com/apt-setup/).
 
 ## Installation
 
 ###  Option #1: Compile Nginx with module bundled
     cd redis-4.0**version**/deps/hiredis
-    make 
-    make install 
+    make
+    make install
     echo /usr/local/lib >> /etc/ld.so.conf
     ldconfig
-    
+
     cd nginx-**version**
-    ./configure --add-module=/path/to/this/ngx_dynamic_limit_req_module 
+    ./configure --add-module=/path/to/this/ngx_dynamic_limit_req_module
     make
     make install
 
@@ -244,15 +265,15 @@ This module can be works with [RedisPushIptables](https://github.com/limithit/Re
 ## Api-count
 ### If you want to use the api counting function, please use [limithit-API_alerts](https://github.com/limithit/ngx_dynamic_limit_req_module/tree/limithit-API_alerts). Because not everyone needs this feature, so it doesn't merge into the trunk. Users who do not need this feature can skip this paragraph description.
 
-``` 
+```
 git clone https://github.com/limithit/ngx_dynamic_limit_req_module.git
 cd ngx_dynamic_limit_req_module
 git checkout limithit-API_alerts
 ```
-``` 
-root@debian:~# redis-cli 
+```
+root@debian:~# redis-cli
 127.0.0.1:6379> SELECT 3
-127.0.0.1:6379[3]> scan 0 match *12/Dec/2018* count 10000 
+127.0.0.1:6379[3]> scan 0 match *12/Dec/2018* count 10000
 127.0.0.1:6379[3]> scan 0 match *PV count 10000
 1) "0"
 2) 1) "[13/Dec/2018]PV"
