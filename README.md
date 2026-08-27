@@ -1,6 +1,3 @@
-[![Powered by OrcaRouter](https://img.shields.io/badge/Powered_by-OrcaRouter-2563eb)](https://www.orcarouter.ai/ref/ref_fc9552cf2331928e7bba)
-
-
  # ngx_dynamic_limit_req_module
 
 ## Introduction
